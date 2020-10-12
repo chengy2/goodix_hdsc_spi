@@ -1,6 +1,6 @@
 version     date           comment
 1.1.1
-            Sept 22,2020   1. Modidy USB CDC device for Goodix
+            Oct  12,2020   1. Modidy for Goodix
 
             Sept 15,2020   1. Modify i2s driver for duplex mode and add example i2s_fullduplex.
                            2. Modify i2s clock pclk source from pclk3 to pclk1.
