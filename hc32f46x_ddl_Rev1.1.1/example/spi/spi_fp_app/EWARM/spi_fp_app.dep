@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>634377385</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_clk.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_gpio.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_exint_nmi_swi.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_gpio.h</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_interrupts.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_efm.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_icg.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\system_hc32f46x.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_dmac.o</file>
+      <file>$PROJ_DIR$\..\..\..\..\mcu\common\hc32_common.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmFunc.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmSimd.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\mcu\common\hc32f46x.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmInstr.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\mcu\common\system_hc32f46x.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\output\debug\Exe\spi_fp_app.out</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cm4.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_icg.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\mcu\common\system_hc32f46x.c</file>
+      <file>$PROJ_DIR$\startup_hc32f46x.s</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_utility.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_clk.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_dmac.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_efm.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_gpio.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_exint_nmi_swi.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_pwc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_interrupts.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_spi.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_usart.c</file>
+      <file>$PROJ_DIR$\..\source\main.c</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_utility.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\main.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_spi.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_pwc.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_usart.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\startup_hc32f46x.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\system_hc32f46x.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_clk.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_dmac.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_efm.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_exint_nmi_swi.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_gpio.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_icg.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_interrupts.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_pwc.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_spi.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_usart.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\hc32f46x_utility.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\output\debug\Obj\spi_fp_app.pbd</file>
+      <file>$PROJ_DIR$\..\source\misc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_usart.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_pwc.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\mcu\common\hc32_ddl.h</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tlf.a</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+      <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
+      <file>$PROJ_DIR$\HC32F46x.icf</file>
+      <file>$PROJ_DIR$\output\debug\List\spi_fp_app.map</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_exint_nmi_swi.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_interrupts.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_spi.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_icg.h</file>
+      <file>$PROJ_DIR$\..\source\misc.c</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_utility.h</file>
+      <file>$PROJ_DIR$\..\source\ddl_config.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_clk.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_dmac.h</file>
+      <file>$PROJ_DIR$\..\..\..\..\driver\inc\hc32f46x_efm.h</file>
+      <file>$PROJ_DIR$\output\debug\Obj\misc.o</file>
+      <file>$PROJ_DIR$\output\debug\Obj\misc.pbi</file>
+    </outputs>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 30 77</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\output\debug\Exe\spi_fp_app.out</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 77</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 76 0 8 5 2 1 6 4 51 50 52 48 49 88 53 7 74 73 75 72</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_icg.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 60</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 6</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 25 26 33 31 29 32 9 23 22 21 10 84 20 19 18 14 16 15 17 13 11 81 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\mcu\common\system_hc32f46x.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 54</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33 31 32 29 28 27 26 25 24 23 22 21 20 19 18 14 16 15 17 13 12 9 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\startup_hc32f46x.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 53</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_utility.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 65</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 48</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33 29 31 13 23 19 15 9 20 18 14 16 17 10 84 27 26 22 25 21 32 11 83 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 83 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_clk.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 55</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 0</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12 27 25 9 26 33 31 29 32 23 22 21 83 84 20 19 18 14 16 15 17 13 24 28 85 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 85 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_dmac.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 8</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 25 27 26 9 33 31 29 32 11 23 22 21 83 84 20 19 18 14 16 15 17 13 10 86 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 86 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_efm.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 57</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 5</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 84 15 29 13 33 31 23 11 20 18 14 16 17 83 9 27 26 22 25 21 32 10 87 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_gpio.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 59</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 12 9 84 15 29 13 33 31 23 20 18 14 16 17 83 27 26 22 25 21 32 24 28 3 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 3 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_exint_nmi_swi.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 58</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 27 25 26 33 31 29 32 11 84 23 22 21 83 9 20 19 18 14 16 15 17 13 10 78 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_pwc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 62</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 51</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33 31 32 29 27 26 25 11 9 23 22 21 83 84 20 19 18 14 16 15 17 13 10 70 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 70 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_interrupts.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 61</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 4</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9 20 16 14 18 17 29 33 11 19 15 13 31 23 83 84 27 26 22 25 21 32 10 79 24 12 28</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 79 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_spi.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 63</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 50</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12 19 9 15 29 13 33 31 23 20 18 14 16 17 83 84 27 26 22 25 21 32 24 28 80 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 80 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_usart.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 52</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 12 20 16 9 14 18 17 29 33 19 15 13 31 23 83 84 27 26 22 25 21 32 24 28 69 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 69 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 83</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\source\main.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 66</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 49</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 33 29 9 31 23 3 80 13 79 19 15 84 85 87 83 20 18 14 16 17 12 68 86 78 81 70 69 27 26 22 25 21 32 24 28 71 11 10</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 71 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 85 86 87 78 3 81 79 70 80 69 83 68</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\source\misc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 89</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 88</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 71 9 20 33 29 15 22 25 17 13 31 16 27 21 19 23 18 14 32 24 28 10 11 12 26 84 85 86 87 78 3 81 79 70 80 69 83 68</file>
+        </tool>
+      </inputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>ILINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

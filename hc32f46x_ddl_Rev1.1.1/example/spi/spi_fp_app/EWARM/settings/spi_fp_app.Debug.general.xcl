@@ -1,0 +1,13 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armjlink2.dll" 
+
+"E:\GitHub\goodix_hdsc_spi\hc32f46x_ddl\example\spi\spi_fp_app\EWARM\output\debug\Exe\spi_fp_app.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.5\arm\bin\armbat.dll" 
+
+--flash_loader "E:\GitHub\goodix_hdsc_spi\hc32f46x_ddl\example\spi\spi_fp_app\EWARM\flashloader\hc32f46x.board" 
+
+
+
+
