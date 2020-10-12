@@ -315,11 +315,9 @@
           <state>$PROJ_DIR$\..\..\..\..\mcu\common</state>
           <state>$PROJ_DIR$\..\source</state>
           <state>$PROJ_DIR$\..\..\..\..\driver\inc</state>
-          <custom>{PROJ_MIDWARE_INC}</custom>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv</state>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\device_core</state>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\device_class\cdc_vcp</state>
-
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1096,7 +1094,7 @@
         <option>
           <name>GBECoreSlave</name>
           <version>24</version>
-            <state>39</state>
+          <state>39</state>
         </option>
         <option>
           <name>OGUseCmsis</name>
@@ -1282,11 +1280,9 @@
           <state>$PROJ_DIR$\..\..\..\..\mcu\common</state>
           <state>$PROJ_DIR$\..\source</state>
           <state>$PROJ_DIR$\..\..\..\..\driver\inc</state>
-          <custom>{PROJ_MIDWARE_INC}</custom>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv</state>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\device_core</state>
           <state>$PROJ_DIR$\..\..\..\..\usb_lib\device_class\cdc_vcp</state>
-
           <state>$PROJ_DIR$\..\..\..\..\utility</state>
         </option>
         <option>
@@ -1941,25 +1937,14 @@
   <group>
     <name>common</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\mcu\common\system_hc32f46x.c</name>
-    </file>
-     <file>
       <name>$PROJ_DIR$\startup_hc32f46x.s</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\mcu\common\system_hc32f46x.c</name>
     </file>
   </group>
   <group>
     <name>driver</name>
-    <!--
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\driver\src\gpio.c</name>
-    </file>
-    -->
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_icg.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_utility.c</name>
-    </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_clk.c</name>
     </file>
@@ -1970,6 +1955,9 @@
       <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_gpio.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_icg.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_interrupts.c</name>
     </file>
     <file>
@@ -1978,66 +1966,15 @@
     <file>
       <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_usart.c</name>
     </file>
-</group>
-  <group>
-    <name>usb_lib</name>
-  <group>
-    <name>ctl_drv</name>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv\usb_core.c</name>
-  </file>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv\usb_otg.c</name>
-  </file>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv\usb_dcd.c</name>
-  </file>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\ctl_drv\usb_dcd_int.c</name>
-  </file>
-</group>
-  <group>
-    <name>device_core</name>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\device_core\usbd_core.c</name>
-  </file>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\device_core\usbd_ioreq.c</name>
-  </file>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\device_core\usbd_req.c</name>
-  </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\driver\src\hc32f46x_utility.c</name>
+    </file>
   </group>
-  <group>
-    <name>device_class</name>
-  <file>
-      <name>$PROJ_DIR$\..\..\..\..\usb_lib\device_class\cdc_vcp\usbd_cdc_vcp_core.c</name>
-  </file>
-  </group>
-
-  </group>
-  <custom>{PROJ_MIDWARE_GRP_H}</custom>
-<custom>{PROJ_MIDWARE_SRC}</custom>
-  <custom>{PROJ_MIDWARE_GRP_T}</custom>
   <group>
     <name>source</name>
     <file>
       <name>$PROJ_DIR$\..\source\main.c</name>
     </file>
-  <file>
-    <name>$PROJ_DIR$\..\source\usbd_cdc_vcp.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\source\usbd_desc.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\source\usbd_usr.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\source\usb_bsp_template.c</name>
-  </file>
-
-   
   </group>
 </project>
 

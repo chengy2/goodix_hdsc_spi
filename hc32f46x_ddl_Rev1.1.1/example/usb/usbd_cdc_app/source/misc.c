@@ -67,7 +67,6 @@
 #define SPI_SCK_PIN                     (Pin13)
 #define SPI_SCK_FUNC                    (Func_Spi3_Sck)
 
-
 /* SPI_MOSI Port/Pin definition */
 #define SPI_MOSI_PORT                   (PortB)
 #define SPI_MOSI_PIN                    (Pin15)
@@ -79,7 +78,6 @@
 #define SPI_MISO_FUNC                   (Func_Spi3_Miso)
 
 /* SPI unit and clock definition */
-#define SPI_UNIT                        (M4_SPI3)
 #define SPI_UNIT_CLOCK                  (PWC_FCG1_PERIPH_SPI3)
 
 #define SPI_DUMMY_BYTE_VALUE            (0xffu)
@@ -90,10 +88,10 @@
 #define SPI_MASTER_DMA_TX_INT_SRC       (INT_DMA1_TC0)
 #define SPI_DMA_TX_TRIG_SOURCE          (EVT_SPI3_SPTI)
 
-#define SPI_DMA_RX_UNIT                 (M4_DMA2)
-#define SPI_DMA_RX_CH                   (DmaCh0)
+#define SPI_DMA_RX_UNIT                 (M4_DMA1)
+#define SPI_DMA_RX_CH                   (DmaCh1)
 #define SPI_MASTER_DMA_RX_IRQn          (Int001_IRQn)
-#define SPI_MASTER_DMA_RX_INT_SRC       (INT_DMA2_TC0)
+#define SPI_MASTER_DMA_RX_INT_SRC       (INT_DMA1_TC1)
 #define SPI_DMA_RX_TRIG_SOURCE          (EVT_SPI3_SPRI)
 
 #define DP_PORT                         (PortA)
@@ -120,10 +118,40 @@
 #define FP_INT_IRQn                     (Int005_IRQn)
 #define FP_INT_SRC                      (INT_PORT_EIRQ0)
 
+/* SPI_SLAVE_SCK Port/Pin definition */
+#define SPI_SLAVE_SCK_PORT              (PortB)
+#define SPI_SLAVE_SCK_PIN               (Pin05)
+#define SPI_SLAVE_SCK_FUNC              (Func_Spi4_Sck)
+
+/* SPI_SLAVE_MOSI Port/Pin definition */
+#define SPI_SLAVE_MOSI_PORT             (PortB)
+#define SPI_SLAVE_MOSI_PIN              (Pin03)
+#define SPI_SLAVE_MOSI_FUNC             (Func_Spi4_Mosi)
+
+/* SPI_SLAVE_MISO Port/Pin definition */
+#define SPI_SLAVE_MISO_PORT             (PortB)
+#define SPI_SLAVE_MISO_PIN              (Pin04)
+#define SPI_SLAVE_MISO_FUNC             (Func_Spi4_Miso)
+
+/* SPI slave unit and clock definition */
+#define SPI_SLAVE_UNIT_CLOCK            (PWC_FCG1_PERIPH_SPI4)
+
+#define SPI_SLAVE_DMA_TX_UNIT           (M4_DMA2)
+#define SPI_SLAVE_DMA_TX_CH             (DmaCh0)
+#define SPI_SLAVE_DMA_TX_IRQn           (Int007_IRQn)
+#define SPI_SLAVE_DMA_TX_INT_SRC        (INT_DMA2_TC0)
+#define SPI_SLAVE_DMA_TX_TRIG_SOURCE    (EVT_SPI4_SPTI)
+
+#define SPI_SLAVE_DMA_RX_UNIT           (M4_DMA2)
+#define SPI_SLAVE_DMA_RX_CH             (DmaCh1)
+#define SPI_SLAVE_DMA_RX_IRQn           (Int008_IRQn)
+#define SPI_SLAVE_DMA_RX_INT_SRC        (INT_DMA2_TC1)
+#define SPI_SLAVE_DMA_RX_TRIG_SOURCE    (EVT_SPI4_SPRI)
+
 /*******************************************************************************
  * Global variable definitions (declared in header file with 'extern')
  ******************************************************************************/
-extern  USB_OTG_CORE_HANDLE      USB_OTG_dev;
+//extern  USB_OTG_CORE_HANDLE      USB_OTG_dev;
 /*******************************************************************************
  * Local function prototypes ('static')
  ******************************************************************************/
@@ -131,7 +159,8 @@ extern  USB_OTG_CORE_HANDLE      USB_OTG_dev;
 /*******************************************************************************
  * Local variable definitions ('static')
  ******************************************************************************/
-
+static const uint8_t SpiDummyByte = 0xFFu;
+static uint8_t SpiDummyRead;
 /*******************************************************************************
  * Function implementation - global ('extern') and local ('static')
  ******************************************************************************/
@@ -334,12 +363,11 @@ void MasterSpiDmaInit(void)
 {
     stc_irq_regi_conf_t stcIrqRegiConf;
     stc_dma_config_t stcDmaCfg;
-    const uint8_t SpiDummyByte = 0xFFu;
 
     /* configuration structure initialization */
     MEM_ZERO_STRUCT(stcDmaCfg);
 
-    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS | PWC_FCG0_PERIPH_DMA1 | PWC_FCG0_PERIPH_DMA2, Enable);
+    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS | PWC_FCG0_PERIPH_DMA1, Enable);
 
     /* Configure TX DMA */
     stcDmaCfg.u16BlockSize = 1u;
@@ -389,6 +417,16 @@ void MasterSpiDmaInit(void)
     DMA_Cmd(SPI_DMA_RX_UNIT, Enable);
 }
 
+/**
+ *******************************************************************************
+ ** \brief  Receive SPI data with DMA
+ ** \param  [in] SPIx                   SPI Unit
+ **              SPI_UNIT               SPI Master unit
+ **              SPI_SLAVE_UNIT         SPI Slave unit
+ ** \param  [in] pu8Data
+ ** \param  [in] len
+ ** \retval None
+ ******************************************************************************/
 en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len)
 {
     en_result_t enRet = Ok;
@@ -397,8 +435,9 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
     {
         enRet = ErrorInvalidParameter;
     }
-    else
+    else if(SPI_UNIT == SPIx)
     {
+        /* SPI master data receive */
         SPI_Cmd(SPI_UNIT, Disable);
 //        DMA_SetSrcAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, &SpiDummyByte);
 //        DMA_SetDesAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SPIx->DR);
@@ -413,9 +452,78 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
 
         SPI_Cmd(SPI_UNIT, Enable);
     }
+    else if(SPI_SLAVE_UNIT == SPIx)
+    {
+        /* SPI slave data receive */
+        SPI_Cmd(SPI_SLAVE_UNIT, Disable);
+        DMA_SetSrcAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SpiDummyByte);
+        //DMA_SetDesAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetTransferCnt(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, len);
+        DMA_SetTransferCnt(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, len);
+
+        //DMA_SetSrcAddress(SPI_DMA_RX_UNIT, SPI_DMA_RX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetDesAddress(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, (uint32_t)pu8Data);
+
+        DMA_ChannelCmd(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, Enable);
+        DMA_ChannelCmd(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, Enable);
+
+        SPI_Cmd(SPI_SLAVE_UNIT, Enable);
+    }
+    else
+    {
+        enRet = ErrorInvalidParameter;
+    }
 
     return enRet;
 }
+
+/**
+ *******************************************************************************
+ ** \brief  Transmit SPI data with DMA
+ ** \param  [in] SPIx                   SPI Unit
+ **              SPI_SLAVE_UNIT         SPI Slave unit
+ ** \param  [in] pu8Data
+ ** \param  [in] len
+ ** \retval None
+ ******************************************************************************/
+en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len)
+{
+    en_result_t enRet = Ok;
+
+    if ((NULL == SPIx) || (NULL == pu8Data))
+    {
+        enRet = ErrorInvalidParameter;
+    }
+    else if(SPI_UNIT == SPIx)
+    {
+        /* SPI master data receive */
+
+    }
+    else if(SPI_SLAVE_UNIT == SPIx)
+    {
+        /* SPI slave data receive */
+        SPI_Cmd(SPI_SLAVE_UNIT, Disable);
+        DMA_SetSrcAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)pu8Data);
+        //DMA_SetDesAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetTransferCnt(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, len);
+        DMA_SetTransferCnt(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, len);
+
+        //DMA_SetSrcAddress(SPI_DMA_RX_UNIT, SPI_DMA_RX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetDesAddress(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, (uint32_t)&SpiDummyRead);
+
+        DMA_ChannelCmd(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, Enable);
+        DMA_ChannelCmd(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, Enable);
+
+        SPI_Cmd(SPI_SLAVE_UNIT, Enable);
+    }
+    else
+    {
+        enRet = ErrorInvalidParameter;
+    }
+
+    return enRet;
+}
+
 /**
  *******************************************************************************
  ** \brief  Callback function for DP wakeup
@@ -473,55 +581,55 @@ void FP_ExintCallback(void)
  ** \retval None
  ** \note   Call before enter stop mode
  ******************************************************************************/
-void USB_DPDMWakeupConfig(void)
-{
-    stc_exint_config_t stcExtiConfig;
-    stc_irq_regi_conf_t stcIrqRegiConf;
-    stc_port_init_t stcPortInit;
-
-    /* GPIO input and exint enable */
-    MEM_ZERO_STRUCT(stcPortInit);
-    stcPortInit.enPinMode = Pin_Mode_In;
-    stcPortInit.enExInt = Enable;
-    PORT_Init(DP_PORT, DP_PIN, &stcPortInit);  /* DP */
-    PORT_Init(DM_PORT, DM_PIN, &stcPortInit);  /* DM */
-
-    /* Exint config */
-    stcExtiConfig.enExitCh = DP_EXINT_CH;
-    stcExtiConfig.enFilterEn = Enable;
-    stcExtiConfig.enFltClk = Pclk3Div8;
-    stcExtiConfig.enExtiLvl = ExIntBothEdge;
-    EXINT_Init(&stcExtiConfig);
-    stcExtiConfig.enExitCh = DM_EXINT_CH;
-    EXINT_Init(&stcExtiConfig);
-
-    /* Select External Int Ch.12 */
-    stcIrqRegiConf.enIntSrc = DP_INT_SRC;
-    stcIrqRegiConf.enIRQn = DP_INT_IRQn;
-    stcIrqRegiConf.pfnCallback = &USB_DP_ExintCallback;
-    enIrqRegistration(&stcIrqRegiConf);
-//    NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
-//    NVIC_SetPriority(stcIrqRegiConf.enIRQn, DDL_IRQ_PRIORITY_15);
-//    NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
-    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
-    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
-
-    /* Select External Int Ch.11 */
-    stcIrqRegiConf.enIntSrc = DM_INT_SRC;
-    stcIrqRegiConf.enIRQn = DM_INT_IRQn;
-    stcIrqRegiConf.pfnCallback = &USB_DM_ExintCallback;
-    enIrqRegistration(&stcIrqRegiConf);
-//    NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
-//    NVIC_SetPriority(stcIrqRegiConf.enIRQn, DDL_IRQ_PRIORITY_15);
-//    NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
-    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
-    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
-
-    /* Enbale exint ch11 and ch12 wakeup from stop mode */
-    enIntWakeupEnable(Extint12WU | Extint11WU);
-}
+//void USB_DPDMWakeupConfig(void)
+//{
+//    stc_exint_config_t stcExtiConfig;
+//    stc_irq_regi_conf_t stcIrqRegiConf;
+//    stc_port_init_t stcPortInit;
+//
+//    /* GPIO input and exint enable */
+//    MEM_ZERO_STRUCT(stcPortInit);
+//    stcPortInit.enPinMode = Pin_Mode_In;
+//    stcPortInit.enExInt = Enable;
+//    PORT_Init(DP_PORT, DP_PIN, &stcPortInit);  /* DP */
+//    PORT_Init(DM_PORT, DM_PIN, &stcPortInit);  /* DM */
+//
+//    /* Exint config */
+//    stcExtiConfig.enExitCh = DP_EXINT_CH;
+//    stcExtiConfig.enFilterEn = Enable;
+//    stcExtiConfig.enFltClk = Pclk3Div8;
+//    stcExtiConfig.enExtiLvl = ExIntBothEdge;
+//    EXINT_Init(&stcExtiConfig);
+//    stcExtiConfig.enExitCh = DM_EXINT_CH;
+//    EXINT_Init(&stcExtiConfig);
+//
+//    /* Select External Int Ch.12 */
+//    stcIrqRegiConf.enIntSrc = DP_INT_SRC;
+//    stcIrqRegiConf.enIRQn = DP_INT_IRQn;
+//    stcIrqRegiConf.pfnCallback = &USB_DP_ExintCallback;
+//    enIrqRegistration(&stcIrqRegiConf);
+////    NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+////    NVIC_SetPriority(stcIrqRegiConf.enIRQn, DDL_IRQ_PRIORITY_15);
+////    NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+//    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+//    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 1, 0);
+//    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+//
+//    /* Select External Int Ch.11 */
+//    stcIrqRegiConf.enIntSrc = DM_INT_SRC;
+//    stcIrqRegiConf.enIRQn = DM_INT_IRQn;
+//    stcIrqRegiConf.pfnCallback = &USB_DM_ExintCallback;
+//    enIrqRegistration(&stcIrqRegiConf);
+////    NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+////    NVIC_SetPriority(stcIrqRegiConf.enIRQn, DDL_IRQ_PRIORITY_15);
+////    NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+//    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+//    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 1, 0);
+//    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+//
+//    /* Enbale exint ch11 and ch12 wakeup from stop mode */
+//    enIntWakeupEnable(Extint12WU | Extint11WU);
+//}
 
 /**
  *******************************************************************************
@@ -530,18 +638,18 @@ void USB_DPDMWakeupConfig(void)
  ** \retval None
  ** \note   Call after wakeup from stop mode
  ******************************************************************************/
-void USB_DPDM_PortInit(void)
-{
-    stc_port_init_t stcPortInit;
-
-    MEM_ZERO_STRUCT(stcPortInit);
-    stcPortInit.enPinMode = Pin_Mode_Ana;
-    PORT_Init(DP_PORT, DP_PIN, &stcPortInit);
-    PORT_Init(DM_PORT, DM_PIN, &stcPortInit);
-
-    /* un-gate USB Core clock */
-    USB_OTG_EnableUSBCoreClock(&USB_OTG_dev);
-}
+//void USB_DPDM_PortInit(void)
+//{
+//    stc_port_init_t stcPortInit;
+//
+//    MEM_ZERO_STRUCT(stcPortInit);
+//    stcPortInit.enPinMode = Pin_Mode_Ana;
+//    PORT_Init(DP_PORT, DP_PIN, &stcPortInit);
+//    PORT_Init(DM_PORT, DM_PIN, &stcPortInit);
+//
+//    /* un-gate USB Core clock */
+//    USB_OTG_EnableUSBCoreClock(&USB_OTG_dev);
+//}
 
 /**
  *******************************************************************************
@@ -636,6 +744,23 @@ void FPIntConfig(void)
     enIntWakeupEnable(Extint0WU);
 }
 
+uint8_t u8TestRev = 0;
+uint8_t u8TestTrans = 0;
+
+void SPI_SLAVE_TxCmplt(void)
+{
+    u8TestTrans = 1;
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
+}
+
+void SPI_SLAVE_RxCmplt(void)
+{
+    u8TestRev = 1;
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
+}
+
 /**
  *******************************************************************************
  ** \brief  Stop mode config for power consumption
@@ -654,6 +779,132 @@ void StopModeConfig(void)
     PWC_StopModeCfg(&stcPwcStopCfg);
 }
 
+static void SlaveSpiDmaInit(void)
+{
+    stc_irq_regi_conf_t stcIrqRegiConf;
+    stc_dma_config_t stcDmaCfg;
+
+    /* configuration structure initialization */
+    MEM_ZERO_STRUCT(stcDmaCfg);
+
+    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS | PWC_FCG0_PERIPH_DMA2, Enable);
+
+    /* Configure TX DMA */
+    stcDmaCfg.u16BlockSize = 1u;
+//    stcDmaCfg.u16TransferCnt = u16BufferLen;
+//    stcDmaCfg.u32SrcAddr = (uint32_t)(&SpiDummyByte);
+    stcDmaCfg.u32DesAddr = (uint32_t)(&SPI_SLAVE_UNIT->DR);
+    stcDmaCfg.stcDmaChCfg.enSrcInc = AddressFix;
+    stcDmaCfg.stcDmaChCfg.enDesInc = AddressFix;
+    stcDmaCfg.stcDmaChCfg.enTrnWidth = Dma8Bit;
+    stcDmaCfg.stcDmaChCfg.enIntEn = Disable;
+    DMA_InitChannel(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, &stcDmaCfg);
+
+    /* Configure RX DMA */
+    stcDmaCfg.u16BlockSize = 1u;
+//    stcDmaCfg.u16TransferCnt = u16BufferLen;
+    stcDmaCfg.u32SrcAddr = (uint32_t)(&SPI_SLAVE_UNIT->DR);
+//    stcDmaCfg.u32DesAddr = (uint32_t)(&u8RxBuffer[0]);
+    stcDmaCfg.stcDmaChCfg.enSrcInc = AddressFix;
+    stcDmaCfg.stcDmaChCfg.enDesInc = AddressIncrease;
+    stcDmaCfg.stcDmaChCfg.enTrnWidth = Dma8Bit;
+    stcDmaCfg.stcDmaChCfg.enIntEn = Enable;
+    DMA_InitChannel(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, &stcDmaCfg);
+
+    DMA_SetTriggerSrc(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, SPI_SLAVE_DMA_TX_TRIG_SOURCE);
+    DMA_SetTriggerSrc(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, SPI_SLAVE_DMA_RX_TRIG_SOURCE);
+
+    /* interrupt */
+    stcIrqRegiConf.enIntSrc = SPI_SLAVE_DMA_TX_INT_SRC;
+    stcIrqRegiConf.enIRQn = SPI_SLAVE_DMA_TX_IRQn;
+    stcIrqRegiConf.pfnCallback = &SPI_SLAVE_TxCmplt;
+    enIrqRegistration(&stcIrqRegiConf);
+    DMA_EnableIrq(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, TrnCpltIrq);
+
+    stcIrqRegiConf.enIntSrc = SPI_SLAVE_DMA_RX_INT_SRC;
+    stcIrqRegiConf.enIRQn = SPI_SLAVE_DMA_RX_IRQn;
+    stcIrqRegiConf.pfnCallback = &SPI_SLAVE_RxCmplt;
+    enIrqRegistration(&stcIrqRegiConf);
+    DMA_EnableIrq(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
+
+    HAL_NVIC_SetPriority(SPI_SLAVE_DMA_TX_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(SPI_SLAVE_DMA_TX_IRQn);
+
+    HAL_NVIC_SetPriority(SPI_SLAVE_DMA_RX_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(SPI_SLAVE_DMA_RX_IRQn);
+
+    DMA_Cmd(SPI_SLAVE_DMA_TX_UNIT, Enable);
+    DMA_Cmd(SPI_SLAVE_DMA_RX_UNIT, Enable);
+}
+/**
+ *******************************************************************************
+ ** \brief  SPI slave init
+ ** \param  None
+ ** \retval None
+ ******************************************************************************/
+void SlaveSpiInit(void)
+{
+    stc_spi_init_t stcSpiInit;
+    stc_port_init_t stcPortInit;
+
+    /* configuration structure initialization */
+    MEM_ZERO_STRUCT(stcSpiInit);
+    MEM_ZERO_STRUCT(stcPortInit);
+
+    /* Configuration peripheral clock */
+    PWC_Fcg1PeriphClockCmd(SPI_SLAVE_UNIT_CLOCK, Enable);
+
+    /* Configuration SPI pin */
+    PORT_SetFunc(SPI_SLAVE_SCK_PORT, SPI_SLAVE_SCK_PIN, SPI_SLAVE_SCK_FUNC, Disable);
+    PORT_SetFunc(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, SPI_SLAVE_MOSI_FUNC, Disable);
+    PORT_SetFunc(SPI_SLAVE_MISO_PORT, SPI_SLAVE_MISO_PIN, SPI_SLAVE_MISO_FUNC, Disable);
+    PORT_SetFunc(SPI_SLAVE_NSS_PORT, SPI_SLAVE_NSS_PIN, SPI_SLAVE_NSS_FUNC, Disable);
+
+    /* Configuration SPI structure */
+    stcSpiInit.enClkDiv = SpiClkDiv16;
+    stcSpiInit.enFrameNumber = SpiFrameNumber1;
+    stcSpiInit.enDataLength = SpiDataLengthBit8;
+    stcSpiInit.enFirstBitPosition = SpiFirstBitPositionMSB;
+    stcSpiInit.enSckPolarity = SpiSckIdleLevelLow;
+    stcSpiInit.enSckPhase = SpiSckOddSampleEvenChange;
+    stcSpiInit.enReadBufferObject = SpiReadReceiverBuffer;
+    stcSpiInit.enWorkMode = SpiWorkMode4Line;
+    stcSpiInit.enTransMode = SpiTransFullDuplex;
+    stcSpiInit.enCommAutoSuspendEn = Disable;
+    stcSpiInit.enModeFaultErrorDetectEn = Disable;
+    stcSpiInit.enParitySelfDetectEn = Disable;
+    stcSpiInit.enParityEn = Disable;
+    stcSpiInit.enParity = SpiParityEven;
+    stcSpiInit.enMasterSlaveMode = SpiModeSlave;
+    stcSpiInit.stcDelayConfig.enSsSetupDelayOption = SpiSsSetupDelayCustomValue;
+    stcSpiInit.stcDelayConfig.enSsSetupDelayTime = SpiSsSetupDelaySck1;
+    stcSpiInit.stcDelayConfig.enSsHoldDelayOption = SpiSsHoldDelayCustomValue;
+    stcSpiInit.stcDelayConfig.enSsHoldDelayTime = SpiSsHoldDelaySck1;
+    stcSpiInit.stcDelayConfig.enSsIntervalTimeOption = SpiSsIntervalCustomValue;
+    stcSpiInit.stcDelayConfig.enSsIntervalTime = SpiSsIntervalSck6PlusPck2;
+
+    SPI_Init(SPI_SLAVE_UNIT, &stcSpiInit);
+    SPI_Cmd(SPI_SLAVE_UNIT, Enable);
+
+    SlaveSpiDmaInit();
+}
+
+/**
+ *******************************************************************************
+ ** \brief  MCU_CPU_IRQ pin init
+ ** \param  None
+ ** \retval None
+ ******************************************************************************/
+void MCU_CPU_IRQ_PinInit(void)
+{
+    stc_port_init_t stcPortInit;
+
+    /* configuration structure initialization */
+    MEM_ZERO_STRUCT(stcPortInit);
+
+    stcPortInit.enPinMode = Pin_Mode_Out;
+    PORT_Init(MCU_CPU_IRQ_PORT, MCU_CPU_IRQ_PIN, &stcPortInit);
+}
 
 /*******************************************************************************
  * EOF (not truncated)

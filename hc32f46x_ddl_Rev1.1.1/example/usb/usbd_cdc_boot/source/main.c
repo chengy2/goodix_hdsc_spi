@@ -98,7 +98,7 @@ static void SysClkIni(void)
 //    stc_clk_output_cfg_t    stcOutputClkCfg;
 //    stc_clk_upll_cfg_t      stcUpllCfg;
     uint16_t timeout = 0u;
-    en_flag_status_t status;    
+    en_flag_status_t status;
 
     MEM_ZERO_STRUCT(enSysClkSrc);
     MEM_ZERO_STRUCT(stcSysClkCfg);
@@ -106,7 +106,7 @@ static void SysClkIni(void)
     MEM_ZERO_STRUCT(stcMpllCfg);
     /* Unlock CLK registers */
     M4_SYSREG->PWR_FPRC |= 0xa501u;
-    
+
     /* Set bus clk div. */
 //    stcSysClkCfg.enHclkDiv = ClkSysclkDiv1;
 //    stcSysClkCfg.enExclkDiv = ClkSysclkDiv2;
@@ -122,20 +122,20 @@ static void SysClkIni(void)
 
     /* Switch system clock source to MPLL. */
     /* Use Xtal as MPLL source. */
-    stcXtalCfg.enMode = ClkXtalModeOsc;
-    stcXtalCfg.enDrv = ClkXtalLowDrv;
-    stcXtalCfg.enFastStartup = Enable;
-    CLK_XtalConfig(&stcXtalCfg);
-    CLK_XtalCmd(Enable);
+//    stcXtalCfg.enMode = ClkXtalModeOsc;
+//    stcXtalCfg.enDrv = ClkXtalLowDrv;
+//    stcXtalCfg.enFastStartup = Enable;
+//    CLK_XtalConfig(&stcXtalCfg);
+//    CLK_XtalCmd(Enable);
 
     /* MPLL config. */
-    stcMpllCfg.pllmDiv = 2u;
-    stcMpllCfg.plln = 48u;
-    stcMpllCfg.PllpDiv = 4u;    //MPLLP = 96
-    stcMpllCfg.PllqDiv = 8u;
-    stcMpllCfg.PllrDiv = 8u;
+    stcMpllCfg.pllmDiv = 4u;    /* 16M/4=4M*/
+    stcMpllCfg.plln = 75u;      /* 4M*75=300M*/
+    stcMpllCfg.PllpDiv = 3u;    /* MPLLP = 100 */
+    stcMpllCfg.PllqDiv = 6u;
+    stcMpllCfg.PllrDiv = 6u;
 //    CLK_SetPllSource(ClkPllSrcXTAL);
-    M4_SYSREG->CMU_PLLCFGR_f.PLLSRC = ClkPllSrcXTAL;
+    M4_SYSREG->CMU_PLLCFGR_f.PLLSRC = ClkPllSrcHRC;
     CLK_MpllConfig(&stcMpllCfg);
 
     /* flash read wait cycle setting */
@@ -162,7 +162,7 @@ static void SysClkIni(void)
     /* Set USB clock source */
 //    CLK_SetUsbClkSource(ClkUsbSrcMpllq);
 
-    M4_SYSREG->CMU_UFSCKCFGR_f.USBCKS = ClkUsbSrcMpllq;
+//    M4_SYSREG->CMU_UFSCKCFGR_f.USBCKS = ClkUsbSrcMpllq;
     /* Lock CLK registers */
     M4_SYSREG->PWR_FPRC = (0xa500u | (M4_SYSREG->PWR_FPRC & (uint16_t)(~1u)));
 #if 0
@@ -192,16 +192,6 @@ int32_t main (void)
 #ifdef UART_DEBUG_PRINTF
     Ddl_UartInit();
 #endif
-
-    USBD_Init(&USB_OTG_dev,
-#ifdef USE_USB_OTG_FS
-              USB_OTG_FS_CORE_ID,
-#else
-              USB_OTG_HS_CORE_ID,
-#endif
-              &USR_desc,
-              &USBD_CDC_cb,
-              &USR_cb);
 
     while (1)
     {

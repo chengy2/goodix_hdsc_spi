@@ -131,7 +131,7 @@ extern "C"
 #define DDL_TIMERA_ENABLE                           (DDL_OFF)
 #define DDL_TRNG_ENABLE                             (DDL_OFF)
 #define DDL_USART_ENABLE                            (DDL_ON)
-#define DDL_USBFS_ENABLE                            (DDL_ON)
+#define DDL_USBFS_ENABLE                            (DDL_OFF)
 #define DDL_WDT_ENABLE                              (DDL_OFF)
 
 

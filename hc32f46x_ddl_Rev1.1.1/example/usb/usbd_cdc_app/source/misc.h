@@ -56,7 +56,8 @@
 /*******************************************************************************
  * Global type definitions ('typedef')
  ******************************************************************************/
-
+#define SPI_UNIT                        (M4_SPI3)
+#define SPI_SLAVE_UNIT                  (M4_SPI4)
 
 /* SPI_NSS Port/Pin definition */
 #define SPI_NSS_PORT                    (PortB)
@@ -64,6 +65,20 @@
 
 #define SPI_NSS_HIGH()                  (PORT_SetBits(SPI_NSS_PORT, SPI_NSS_PIN))
 #define SPI_NSS_LOW()                   (PORT_ResetBits(SPI_NSS_PORT, SPI_NSS_PIN))
+
+/* SPI_SLAVE_NSS Port/Pin definition */
+#define SPI_SLAVE_NSS_PORT              (PortB)
+#define SPI_SLAVE_NSS_PIN               (Pin06)
+#define SPI_SLAVE_NSS_FUNC              (Func_Spi4_Nss0)
+
+#define SPI_SLAVE_NSS_STATE()           (PORT_GetBit(SPI_SLAVE_NSS_PORT, SPI_SLAVE_NSS_PIN))
+
+/* MCU_CPU_IRQ Port/Pin definition */
+#define MCU_CPU_IRQ_PORT                (PortB)
+#define MCU_CPU_IRQ_PIN                 (Pin07)
+
+#define MCU_CPU_IRQ_HIGH()              (PORT_SetBits(MCU_CPU_IRQ_PORT, MCU_CPU_IRQ_PIN))
+#define MCU_CPU_IRQ_LOW()               (PORT_ResetBits(MCU_CPU_IRQ_PORT, MCU_CPU_IRQ_PIN))
 
 /*******************************************************************************
   Global function prototypes (definition in C source)
@@ -73,17 +88,24 @@ void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t Sub
 void HAL_NVIC_ClearPendingIRQ(IRQn_Type IRQn);
 void HAL_NVIC_EnableIRQ(IRQn_Type IRQn);
 void HAL_NVIC_DisableIRQ(IRQn_Type IRQn);
+
 uint8_t SpiFlash_WriteReadByte(uint8_t u8Data);
 en_result_t SpiFlash_ReadData(uint32_t u32Addr, uint8_t pData[], uint16_t len);
 void MasterSpiDmaInit(void);
 en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len);
+en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len);
 void MasterSpiInit(void);
+
+void SlaveSpiInit(void);
+
 void USB_DPDMWakeupConfig(void);
 void USB_DPDM_PortInit(void);
 void EcIntConfig(void);
 void FPIntConfig(void);
 uint32_t GetECStatus(void);
 void StopModeConfig(void);
+
+void MCU_CPU_IRQ_PinInit(void);
 
 #endif /*__MISC_H__*/
 

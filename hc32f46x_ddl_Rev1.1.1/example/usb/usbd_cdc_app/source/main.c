@@ -99,7 +99,7 @@ static void SysClkIni(void)
 //    stc_clk_output_cfg_t    stcOutputClkCfg;
 //    stc_clk_upll_cfg_t      stcUpllCfg;
     uint16_t timeout = 0u;
-    en_flag_status_t status;    
+    en_flag_status_t status;
 
     MEM_ZERO_STRUCT(enSysClkSrc);
     MEM_ZERO_STRUCT(stcSysClkCfg);
@@ -107,7 +107,7 @@ static void SysClkIni(void)
     MEM_ZERO_STRUCT(stcMpllCfg);
     /* Unlock CLK registers */
     M4_SYSREG->PWR_FPRC |= 0xa501u;
-    
+
     /* Set bus clk div. */
 //    stcSysClkCfg.enHclkDiv = ClkSysclkDiv1;
 //    stcSysClkCfg.enExclkDiv = ClkSysclkDiv2;
@@ -123,20 +123,20 @@ static void SysClkIni(void)
 
     /* Switch system clock source to MPLL. */
     /* Use Xtal as MPLL source. */
-    stcXtalCfg.enMode = ClkXtalModeOsc;
-    stcXtalCfg.enDrv = ClkXtalLowDrv;
-    stcXtalCfg.enFastStartup = Enable;
-    CLK_XtalConfig(&stcXtalCfg);
-    CLK_XtalCmd(Enable);
+//    stcXtalCfg.enMode = ClkXtalModeOsc;
+//    stcXtalCfg.enDrv = ClkXtalLowDrv;
+//    stcXtalCfg.enFastStartup = Enable;
+//    CLK_XtalConfig(&stcXtalCfg);
+//    CLK_XtalCmd(Enable);
 
     /* MPLL config. */
-    stcMpllCfg.pllmDiv = 2u;
-    stcMpllCfg.plln = 48u;
-    stcMpllCfg.PllpDiv = 4u;    //MPLLP = 96
-    stcMpllCfg.PllqDiv = 8u;
-    stcMpllCfg.PllrDiv = 8u;
+    stcMpllCfg.pllmDiv = 4u;    /* 16M/4=4M*/
+    stcMpllCfg.plln = 75u;      /* 4M*75=300M*/
+    stcMpllCfg.PllpDiv = 3u;    /* MPLLP = 100 */
+    stcMpllCfg.PllqDiv = 6u;
+    stcMpllCfg.PllrDiv = 6u;
 //    CLK_SetPllSource(ClkPllSrcXTAL);
-    M4_SYSREG->CMU_PLLCFGR_f.PLLSRC = ClkPllSrcXTAL;
+    M4_SYSREG->CMU_PLLCFGR_f.PLLSRC = ClkPllSrcHRC;
     CLK_MpllConfig(&stcMpllCfg);
 
     /* flash read wait cycle setting */
@@ -163,7 +163,7 @@ static void SysClkIni(void)
     /* Set USB clock source */
 //    CLK_SetUsbClkSource(ClkUsbSrcMpllq);
 
-    M4_SYSREG->CMU_UFSCKCFGR_f.USBCKS = ClkUsbSrcMpllq;
+//    M4_SYSREG->CMU_UFSCKCFGR_f.USBCKS = ClkUsbSrcMpllq;
     /* Lock CLK registers */
     M4_SYSREG->PWR_FPRC = (0xa500u | (M4_SYSREG->PWR_FPRC & (uint16_t)(~1u)));
 #if 0
@@ -177,8 +177,10 @@ static void SysClkIni(void)
 #endif
 }
 
-char rxBuffer[128]; // for test
+uint8_t rxBuffer[128]; // for test
 __IO uint32_t test ;
+extern uint8_t u8TestRev;
+extern uint8_t u8TestTrans;
 /**
  *******************************************************************************
  ** \brief  main function for mouse function
@@ -195,35 +197,37 @@ int32_t main (void)
 #ifdef UART_DEBUG_PRINTF
     Ddl_UartInit();
 #endif
-    MasterSpiInit();
-    MasterSpiDmaInit();
-    EcIntConfig();
+    //MasterSpiInit();
+    //MasterSpiDmaInit();
+    //EcIntConfig();
 
-    USBD_Init(&USB_OTG_dev,
-#ifdef USE_USB_OTG_FS
-              USB_OTG_FS_CORE_ID,
-#else
-              USB_OTG_HS_CORE_ID,
-#endif
-              &USR_desc,
-              &USBD_CDC_cb,
-              &USR_cb);
+    SlaveSpiInit();
 
     while (1)
     {
         //SpiFlash_ReadData(0x00, (uint8_t*)&rxBuffer[0], 4);
         /* read ID cmd */
-        SPI_NSS_LOW();
-        SpiFlash_WriteReadByte(0xF0);
-        SpiFlash_WriteReadByte((uint8_t)((0x00 & 0xFF00u) >> 8u));
-        SpiFlash_WriteReadByte((uint8_t)(0x00 & 0xFFu));
-        SPI_NSS_HIGH();
-        Ddl_Delay1ms(100);
-        SPI_NSS_LOW();
-        SpiFlash_WriteReadByte(0xF1);
-        /* read ID via DMA */
-        HAL_SPI_Receive_DMA(M4_SPI3, (uint8_t*)&rxBuffer, 4);
-        test = GetECStatus();
+        //SPI_NSS_LOW();
+        //SpiFlash_WriteReadByte(0xF0);
+        //SpiFlash_WriteReadByte((uint8_t)((0x00 & 0xFF00u) >> 8u));
+        //SpiFlash_WriteReadByte((uint8_t)(0x00 & 0xFFu));
+        //SPI_NSS_HIGH();
+        //Ddl_Delay1ms(100);
+        //SPI_NSS_LOW();
+        //SpiFlash_WriteReadByte(0xF1);
+        ///* read ID via DMA */
+        //HAL_SPI_Receive_DMA(M4_SPI3, (uint8_t*)&rxBuffer, 4);
+        //test = GetECStatus();
+
+        HAL_SPI_Receive_DMA(SPI_SLAVE_UNIT, rxBuffer, 120ul);
+
+        while(0 == u8TestRev);
+        u8TestRev = 0;
+
+        HAL_SPI_Transmit_DMA(SPI_SLAVE_UNIT, rxBuffer, 120ul);
+        while(0 == u8TestTrans);
+        u8TestTrans = 0;
+
     }
 }
 
