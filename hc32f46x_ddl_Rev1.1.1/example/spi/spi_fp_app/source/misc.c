@@ -430,6 +430,7 @@ void MasterSpiDmaInit(void)
 en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len)
 {
     en_result_t enRet = Ok;
+    stc_dma_ch_cfg_t stcDmaChCfg;
 
     if ((NULL == SPIx) || (NULL == pu8Data))
     {
@@ -454,10 +455,25 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
     }
     else if(SPI_SLAVE_UNIT == SPIx)
     {
+        MEM_ZERO_STRUCT(stcDmaChCfg);
+        /* DMA src and des inc config */
+        stcDmaChCfg.enSrcInc = AddressFix;
+        stcDmaChCfg.enDesInc = AddressFix;
+        stcDmaChCfg.enTrnWidth = Dma8Bit;
+        stcDmaChCfg.enIntEn = Disable;
+        DMA_ChannelCfg(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, &stcDmaChCfg);
+
+         /* DMA src and des inc config */
+        stcDmaChCfg.enSrcInc = AddressFix;
+        stcDmaChCfg.enDesInc = AddressIncrease;
+        stcDmaChCfg.enTrnWidth = Dma8Bit;
+        stcDmaChCfg.enIntEn = Enable;
+        DMA_ChannelCfg(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, &stcDmaChCfg);
+
         /* SPI slave data receive */
         SPI_Cmd(SPI_SLAVE_UNIT, Disable);
-        DMA_SetSrcAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SpiDummyByte);
-        //DMA_SetDesAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetSrcAddress(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, (uint32_t)&SpiDummyByte);
+        //DMA_SetDesAddress(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
         DMA_SetTransferCnt(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, len);
         DMA_SetTransferCnt(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, len);
 
@@ -489,6 +505,7 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
 en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], uint16_t len)
 {
     en_result_t enRet = Ok;
+    stc_dma_ch_cfg_t stcDmaChCfg;
 
     if ((NULL == SPIx) || (NULL == pu8Data))
     {
@@ -501,14 +518,29 @@ en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], 
     }
     else if(SPI_SLAVE_UNIT == SPIx)
     {
+        MEM_ZERO_STRUCT(stcDmaChCfg);
+        /* DMA src and des inc config */
+        stcDmaChCfg.enSrcInc = AddressIncrease;
+        stcDmaChCfg.enDesInc = AddressFix;
+        stcDmaChCfg.enTrnWidth = Dma8Bit;
+        stcDmaChCfg.enIntEn = Enable;
+        DMA_ChannelCfg(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, &stcDmaChCfg);
+
+         /* DMA src and des inc config */
+        stcDmaChCfg.enSrcInc = AddressFix;
+        stcDmaChCfg.enDesInc = AddressFix;
+        stcDmaChCfg.enTrnWidth = Dma8Bit;
+        stcDmaChCfg.enIntEn = Disable;
+        DMA_ChannelCfg(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, &stcDmaChCfg);
+
         /* SPI slave data receive */
         SPI_Cmd(SPI_SLAVE_UNIT, Disable);
-        DMA_SetSrcAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)pu8Data);
-        //DMA_SetDesAddress(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        DMA_SetSrcAddress(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, (uint32_t)pu8Data);
+        //DMA_SetDesAddress(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
         DMA_SetTransferCnt(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, len);
         DMA_SetTransferCnt(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, len);
 
-        //DMA_SetSrcAddress(SPI_DMA_RX_UNIT, SPI_DMA_RX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
+        //DMA_SetSrcAddress(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, (uint32_t)&SPI_SLAVE_UNIT->DR);
         DMA_SetDesAddress(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, (uint32_t)&SpiDummyRead);
 
         DMA_ChannelCmd(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, Enable);
@@ -855,6 +887,8 @@ void SlaveSpiInit(void)
     PWC_Fcg1PeriphClockCmd(SPI_SLAVE_UNIT_CLOCK, Enable);
 
     /* Configuration SPI pin */
+    PORT_DebugPortSetting(TDO_SWO, Disable);
+    PORT_DebugPortSetting(TRST, Disable);
     PORT_SetFunc(SPI_SLAVE_SCK_PORT, SPI_SLAVE_SCK_PIN, SPI_SLAVE_SCK_FUNC, Disable);
     PORT_SetFunc(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, SPI_SLAVE_MOSI_FUNC, Disable);
     PORT_SetFunc(SPI_SLAVE_MISO_PORT, SPI_SLAVE_MISO_PIN, SPI_SLAVE_MISO_FUNC, Disable);

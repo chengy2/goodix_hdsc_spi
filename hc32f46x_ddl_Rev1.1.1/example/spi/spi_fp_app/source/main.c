@@ -199,6 +199,12 @@ int32_t main (void)
 
     SlaveSpiInit();
 
+    MCU_CPU_IRQ_PinInit();
+
+    MCU_CPU_IRQ_HIGH();
+
+    MCU_CPU_IRQ_LOW();
+
     while (1)
     {
         //SpiFlash_ReadData(0x00, (uint8_t*)&rxBuffer[0], 4);
@@ -214,7 +220,8 @@ int32_t main (void)
         ///* read ID via DMA */
         //HAL_SPI_Receive_DMA(M4_SPI3, (uint8_t*)&rxBuffer, 4);
         //test = GetECStatus();
-
+#if 0
+        /* For test */
         HAL_SPI_Receive_DMA(SPI_SLAVE_UNIT, rxBuffer, 120ul);
 
         while(0 == u8TestRev);
@@ -223,7 +230,8 @@ int32_t main (void)
         HAL_SPI_Transmit_DMA(SPI_SLAVE_UNIT, rxBuffer, 120ul);
         while(0 == u8TestTrans);
         u8TestTrans = 0;
-
+#endif
+        test = SPI_SLAVE_NSS_STATE();
     }
 }
 
