@@ -97,6 +97,7 @@ en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], 
 void MasterSpiInit(void);
 
 void SlaveSpiInit(void);
+void SlaveSpiDeInit(void);
 
 void USB_DPDMWakeupConfig(void);
 void USB_DPDM_PortInit(void);
@@ -106,6 +107,8 @@ uint32_t GetECStatus(void);
 void StopModeConfig(void);
 
 void MCU_CPU_IRQ_PinInit(void);
+
+void SpiMosiIntConfig(void);
 
 #endif /*__MISC_H__*/
 

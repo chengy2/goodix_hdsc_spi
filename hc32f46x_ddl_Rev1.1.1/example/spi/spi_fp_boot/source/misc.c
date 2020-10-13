@@ -127,6 +127,9 @@
 #define SPI_SLAVE_MOSI_PORT             (PortB)
 #define SPI_SLAVE_MOSI_PIN              (Pin03)
 #define SPI_SLAVE_MOSI_FUNC             (Func_Spi4_Mosi)
+#define SPI_SLAVE_MOSI_EXINT_CH         (ExtiCh03)
+#define SPI_SLAVE_MOSI_INT_IRQn         (Int009_IRQn)
+#define SPI_SLAVE_MOSI_INT_SRC          (INT_PORT_EIRQ3)
 
 /* SPI_SLAVE_MISO Port/Pin definition */
 #define SPI_SLAVE_MISO_PORT             (PortB)
@@ -925,6 +928,28 @@ void SlaveSpiInit(void)
 
 /**
  *******************************************************************************
+ ** \brief  SPI slave de-init
+ ** \param  None
+ ** \retval None
+ ******************************************************************************/
+void SlaveSpiDeInit(void)
+{
+    SPI_DeInit(SPI_SLAVE_UNIT);
+
+    PORT_SetFunc(SPI_SLAVE_SCK_PORT, SPI_SLAVE_SCK_PIN, Func_Gpio, Disable);
+    PORT_SetFunc(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, Func_Gpio, Disable);
+    PORT_SetFunc(SPI_SLAVE_MISO_PORT, SPI_SLAVE_MISO_PIN, Func_Gpio, Disable);
+    PORT_SetFunc(SPI_SLAVE_NSS_PORT, SPI_SLAVE_NSS_PIN, Func_Gpio, Disable);
+
+    DMA_DeInit(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH);
+    DMA_DeInit(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH);
+
+    HAL_NVIC_DisableIRQ(SPI_SLAVE_DMA_TX_IRQn);
+    HAL_NVIC_DisableIRQ(SPI_SLAVE_DMA_RX_IRQn);
+}
+
+/**
+ *******************************************************************************
  ** \brief  MCU_CPU_IRQ pin init
  ** \param  None
  ** \retval None
@@ -938,6 +963,57 @@ void MCU_CPU_IRQ_PinInit(void)
 
     stcPortInit.enPinMode = Pin_Mode_Out;
     PORT_Init(MCU_CPU_IRQ_PORT, MCU_CPU_IRQ_PIN, &stcPortInit);
+}
+
+/**
+ *******************************************************************************
+ ** \brief  Callback function for MOSI exint
+ ** \param  None
+ ** \retval None
+ ******************************************************************************/
+void MOSI_ExintCallback(void)
+{
+    /* add your code here */
+    EXINT_IrqFlgClr(SPI_SLAVE_MOSI_EXINT_CH);
+}
+
+/**
+ *******************************************************************************
+ ** \brief  Exint configure for SPI slave MOSI pin
+ ** \param  None
+ ** \retval None
+ ******************************************************************************/
+void SpiMosiIntConfig(void)
+{
+    stc_exint_config_t stcExtiConfig;
+    stc_irq_regi_conf_t stcIrqRegiConf;
+    stc_port_init_t stcPortInit;
+
+    /* GPIO input and exint enable */
+    MEM_ZERO_STRUCT(stcPortInit);
+    stcPortInit.enPinMode = Pin_Mode_In;
+    stcPortInit.enExInt = Enable;
+    PORT_Init(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, &stcPortInit);
+
+    /* Exint config */
+    stcExtiConfig.enExitCh = SPI_SLAVE_MOSI_EXINT_CH;
+    stcExtiConfig.enFilterEn = Enable;
+    stcExtiConfig.enFltClk = Pclk3Div8;
+    stcExtiConfig.enExtiLvl = ExIntRisingEdge;  /* Rising edge */
+    EXINT_Init(&stcExtiConfig);
+
+    /* Select External Int Ch.11 */
+    stcIrqRegiConf.enIntSrc = SPI_SLAVE_MOSI_INT_SRC;
+    stcIrqRegiConf.enIRQn = SPI_SLAVE_MOSI_INT_IRQn;
+    stcIrqRegiConf.pfnCallback = &MOSI_ExintCallback;
+    enIrqRegistration(&stcIrqRegiConf);
+
+    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+
+    /* Enable wakeup */
+    enIntWakeupEnable(Extint0WU);
 }
 
 /*******************************************************************************
