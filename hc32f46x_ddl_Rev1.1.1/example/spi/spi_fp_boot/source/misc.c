@@ -355,6 +355,8 @@ void SPI_RxCmplt(void)
     SPI_NSS_HIGH();
     DMA_ClearIrqFlag(SPI_DMA_RX_UNIT, SPI_DMA_RX_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(SPI_DMA_RX_UNIT, SPI_DMA_RX_CH, BlkTrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_DMA_TX_UNIT, SPI_DMA_TX_CH, BlkTrnCpltIrq);
 }
 
 void SPI_TxCmplt(void)
@@ -787,6 +789,9 @@ void SPI_SLAVE_TxCmplt(void)
     u8TestTrans = 1;
     DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, BlkTrnCpltIrq);
+
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
 }
 
 void SPI_SLAVE_RxCmplt(void)
@@ -794,6 +799,9 @@ void SPI_SLAVE_RxCmplt(void)
     u8TestRev = 1;
     DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
+
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, BlkTrnCpltIrq);
 }
 
 /**
@@ -823,6 +831,14 @@ static void SlaveSpiDmaInit(void)
     MEM_ZERO_STRUCT(stcDmaCfg);
 
     PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS | PWC_FCG0_PERIPH_DMA2, Enable);
+
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, BlkTrnCpltIrq);
+
+    DMA_DeInit(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH);
+    DMA_DeInit(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH);
 
     /* Configure TX DMA */
     stcDmaCfg.u16BlockSize = 1u;
@@ -897,6 +913,7 @@ void SlaveSpiInit(void)
     PORT_SetFunc(SPI_SLAVE_MISO_PORT, SPI_SLAVE_MISO_PIN, SPI_SLAVE_MISO_FUNC, Disable);
     PORT_SetFunc(SPI_SLAVE_NSS_PORT, SPI_SLAVE_NSS_PIN, SPI_SLAVE_NSS_FUNC, Disable);
 
+    SPI_DeInit(SPI_SLAVE_UNIT);
     /* Configuration SPI structure */
     stcSpiInit.enClkDiv = SpiClkDiv16;
     stcSpiInit.enFrameNumber = SpiFrameNumber1;
