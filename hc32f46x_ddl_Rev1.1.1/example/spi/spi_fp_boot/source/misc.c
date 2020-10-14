@@ -785,8 +785,8 @@ uint8_t u8TestTrans = 0;
 void SPI_SLAVE_TxCmplt(void)
 {
     u8TestTrans = 1;
-    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, TrnCpltIrq);
-    DMA_ClearIrqFlag(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH, BlkTrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, TrnCpltIrq);
+    DMA_ClearIrqFlag(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH, BlkTrnCpltIrq);
 }
 
 void SPI_SLAVE_RxCmplt(void)
