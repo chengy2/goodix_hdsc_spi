@@ -108,7 +108,7 @@ void StopModeConfig(void);
 
 void MCU_CPU_IRQ_PinInit(void);
 
-void SpiMosiIntConfig(void);
+void USART_RX_IntConfig(void);
 
 #endif /*__MISC_H__*/
 

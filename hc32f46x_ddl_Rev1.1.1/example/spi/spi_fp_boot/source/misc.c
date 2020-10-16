@@ -134,6 +134,10 @@
 #define USART_RX_PORT                   (PortB)
 #define USART_RX_PIN                    (Pin03)
 #define USART_RX_FUNC                   (Func_Usart4_Rx)
+#define USART_RX_EXINT_CH               (ExtiCh03)
+#define USART_RX_INT_IRQn               (Int009_IRQn)
+#define USART_RX_INT_SRC                (INT_PORT_EIRQ3)
+
 /* USART TX Port/Pin definition */
 #define USART_TX_PORT                   (PortB)
 #define USART_TX_PIN                    (Pin04)
@@ -439,7 +443,7 @@ void MasterSpiDmaInit(void)
  ** \brief  Receive SPI data with DMA
  ** \param  [in] SPIx                   SPI Unit
  **              SPI_UNIT               SPI Master unit
- **              SPI_SLAVE_UNIT         SPI Slave unit
+ **              SPI_SLAVE_UNIT         SPI Slave unit(USART)
  ** \param  [in] pu8Data
  ** \param  [in] len
  ** \retval None
@@ -561,12 +565,12 @@ en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], 
  ** \param  None
  ** \retval None
  ******************************************************************************/
-void USB_DP_ExintCallback(void)
-{
-    /* add your code here */
-    HAL_NVIC_DisableIRQ(DP_INT_IRQn);
-    EXINT_IrqFlgClr(DP_EXINT_CH);
-}
+//void USB_DP_ExintCallback(void)
+//{
+//    /* add your code here */
+//    HAL_NVIC_DisableIRQ(DP_INT_IRQn);
+//    EXINT_IrqFlgClr(DP_EXINT_CH);
+//}
 
 /**
  *******************************************************************************
@@ -574,12 +578,12 @@ void USB_DP_ExintCallback(void)
  ** \param  None
  ** \retval None
  ******************************************************************************/
-void USB_DM_ExintCallback(void)
-{
-    /* add your code here */
-    HAL_NVIC_DisableIRQ(DM_INT_IRQn);
-    EXINT_IrqFlgClr(DM_EXINT_CH);
-}
+//void USB_DM_ExintCallback(void)
+//{
+//    /* add your code here */
+//    HAL_NVIC_DisableIRQ(DM_INT_IRQn);
+//    EXINT_IrqFlgClr(DM_EXINT_CH);
+//}
 
 /**
  *******************************************************************************
@@ -920,7 +924,7 @@ static void UsartErrIrqCallback(void)
 
 /**
  *******************************************************************************
- ** \brief  SPI slave init
+ ** \brief  SPI slave init(USART)
  ** \param  None
  ** \retval None
  ******************************************************************************/
@@ -945,6 +949,7 @@ void SlaveSpiInit(void)
     PORT_SetFunc(USART_RX_PORT, USART_RX_PIN, USART_RX_FUNC, Disable);
     PORT_SetFunc(USART_TX_PORT, USART_TX_PIN, USART_TX_FUNC, Disable);
 
+    USART_DeInit(USART_UNIT);
     /* Initialize USART */
     USART_CLKSYNC_Init(USART_UNIT, &stcInitCfg);
     //USART_SetBaudrate(USART_UNIT, USART_BAUDRATE);
@@ -965,24 +970,24 @@ void SlaveSpiInit(void)
 
 /**
  *******************************************************************************
- ** \brief  SPI slave de-init
+ ** \brief  SPI slave de-init(USART)
  ** \param  None
  ** \retval None
  ******************************************************************************/
 void SlaveSpiDeInit(void)
 {
-//    SPI_DeInit(SPI_SLAVE_UNIT);
-//
-//    PORT_SetFunc(SPI_SLAVE_SCK_PORT, SPI_SLAVE_SCK_PIN, Func_Gpio, Disable);
-//    PORT_SetFunc(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, Func_Gpio, Disable);
-//    PORT_SetFunc(SPI_SLAVE_MISO_PORT, SPI_SLAVE_MISO_PIN, Func_Gpio, Disable);
-//    PORT_SetFunc(SPI_SLAVE_NSS_PORT, SPI_SLAVE_NSS_PIN, Func_Gpio, Disable);
-//
-//    DMA_DeInit(SPI_SLAVE_DMA_TX_UNIT, SPI_SLAVE_DMA_TX_CH);
-//    DMA_DeInit(SPI_SLAVE_DMA_RX_UNIT, SPI_SLAVE_DMA_RX_CH);
-//
-//    HAL_NVIC_DisableIRQ(SPI_SLAVE_DMA_TX_IRQn);
-//    HAL_NVIC_DisableIRQ(SPI_SLAVE_DMA_RX_IRQn);
+    USART_DeInit(USART_UNIT);
+
+    PORT_SetFunc(USART_CK_PORT, USART_CK_PIN, Func_Gpio, Disable);
+    PORT_SetFunc(USART_RX_PORT, USART_RX_PIN, Func_Gpio, Disable);
+    PORT_SetFunc(USART_TX_PORT, USART_TX_PIN, Func_Gpio, Disable);
+
+    DMA_DeInit(USART_TX_DMA_UNIT, USART_TX_DMA_CH);
+    DMA_DeInit(USART_TX_DMA_UNIT, USART_RX_DMA_CH);
+
+    HAL_NVIC_DisableIRQ(USART_EI_IRQn);
+    HAL_NVIC_DisableIRQ(TX_DMA_BTC_INT_IRQn);
+    HAL_NVIC_DisableIRQ(RX_DMA_BTC_INT_IRQn);
 }
 
 /**
@@ -1004,53 +1009,53 @@ void MCU_CPU_IRQ_PinInit(void)
 
 /**
  *******************************************************************************
- ** \brief  Callback function for MOSI exint
+ ** \brief  Callback function for USART RX exint
  ** \param  None
  ** \retval None
  ******************************************************************************/
-void MOSI_ExintCallback(void)
+void USART_RX_ExintCallback(void)
 {
     /* add your code here */
-//    EXINT_IrqFlgClr(SPI_SLAVE_MOSI_EXINT_CH);
+    EXINT_IrqFlgClr(USART_RX_EXINT_CH);
 }
 
 /**
  *******************************************************************************
- ** \brief  Exint configure for SPI slave MOSI pin
+ ** \brief  Exint configure for USART RX pin
  ** \param  None
  ** \retval None
  ******************************************************************************/
-void SpiMosiIntConfig(void)
+void USART_RX_IntConfig(void)
 {
-//    stc_exint_config_t stcExtiConfig;
-//    stc_irq_regi_conf_t stcIrqRegiConf;
-//    stc_port_init_t stcPortInit;
-//
-//    /* GPIO input and exint enable */
-//    MEM_ZERO_STRUCT(stcPortInit);
-//    stcPortInit.enPinMode = Pin_Mode_In;
-//    stcPortInit.enExInt = Enable;
-//    PORT_Init(SPI_SLAVE_MOSI_PORT, SPI_SLAVE_MOSI_PIN, &stcPortInit);
-//
-//    /* Exint config */
-//    stcExtiConfig.enExitCh = SPI_SLAVE_MOSI_EXINT_CH;
-//    stcExtiConfig.enFilterEn = Enable;
-//    stcExtiConfig.enFltClk = Pclk3Div8;
-//    stcExtiConfig.enExtiLvl = ExIntRisingEdge;  /* Rising edge */
-//    EXINT_Init(&stcExtiConfig);
-//
-//    /* Select External Int Ch.11 */
-//    stcIrqRegiConf.enIntSrc = SPI_SLAVE_MOSI_INT_SRC;
-//    stcIrqRegiConf.enIRQn = SPI_SLAVE_MOSI_INT_IRQn;
-//    stcIrqRegiConf.pfnCallback = &MOSI_ExintCallback;
-//    enIrqRegistration(&stcIrqRegiConf);
-//
-//    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
-//    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 2, 0);
-//    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
-//
-//    /* Enable wakeup */
-//    enIntWakeupEnable(Extint0WU);
+    stc_exint_config_t stcExtiConfig;
+    stc_irq_regi_conf_t stcIrqRegiConf;
+    stc_port_init_t stcPortInit;
+
+    /* GPIO input and exint enable */
+    MEM_ZERO_STRUCT(stcPortInit);
+    stcPortInit.enPinMode = Pin_Mode_In;
+    stcPortInit.enExInt = Enable;
+    PORT_Init(USART_RX_PORT, USART_RX_PIN, &stcPortInit);
+
+    /* Exint config */
+    stcExtiConfig.enExitCh = USART_RX_EXINT_CH;
+    stcExtiConfig.enFilterEn = Enable;
+    stcExtiConfig.enFltClk = Pclk3Div8;
+    stcExtiConfig.enExtiLvl = ExIntRisingEdge;  /* Rising edge */
+    EXINT_Init(&stcExtiConfig);
+
+    /* Select External Int Ch.11 */
+    stcIrqRegiConf.enIntSrc = USART_RX_INT_SRC;
+    stcIrqRegiConf.enIRQn = USART_RX_INT_IRQn;
+    stcIrqRegiConf.pfnCallback = &USART_RX_ExintCallback;
+    enIrqRegistration(&stcIrqRegiConf);
+
+    HAL_NVIC_ClearPendingIRQ(stcIrqRegiConf.enIRQn);
+    HAL_NVIC_SetPriority(stcIrqRegiConf.enIRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(stcIrqRegiConf.enIRQn);
+
+    /* Enable wakeup */
+    enIntWakeupEnable(Extint3WU);
 }
 
 /*******************************************************************************
