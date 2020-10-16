@@ -335,6 +335,8 @@ en_result_t USART_CLKSYNC_Init(M4_USART_TypeDef *USARTx,
         PR_f.PSC = (uint32_t)(pstcInitCfg->enClkDiv);
         CR2_f.CLKC = (uint32_t)(pstcInitCfg->enClkMode);
         CR3_f.CTSE = (uint32_t)(pstcInitCfg->enHwFlow);
+        *(uint32_t *)&CR2_f &= ~0x0600;
+        *(uint32_t *)&CR2_f |= 0x0200;  // CPOL=0, CPHA=1
 
         USARTx->PR_f = PR_f;
         USARTx->CR1_f= CR1_f;
