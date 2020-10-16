@@ -110,6 +110,10 @@ void MCU_CPU_IRQ_PinInit(void);
 
 void USART_RX_IntConfig(void);
 
+void RandInit(void);
+uint32_t FlashRandGenerate(void);
+void RandStop(void);
+
 #endif /*__MISC_H__*/
 
 /*******************************************************************************

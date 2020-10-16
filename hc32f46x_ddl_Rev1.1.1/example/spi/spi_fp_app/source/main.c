@@ -113,8 +113,9 @@ static void SysClkIni(void)
 //    stcSysClkCfg.enPclk3Div = ClkSysclkDiv4;
 //    stcSysClkCfg.enPclk4Div = ClkSysclkDiv2;
 //    CLK_SysClkConfig(&stcSysClkCfg);
-    M4_SYSREG->CMU_SCFGR = (0UL << 24U) | (1UL << 20U) | (1UL << 16U) | \
-                           (2UL << 12U) | (2UL << 8U)  | (1UL << 4U)  | \
+    /* HCLK 100M; EXCKS 50M; PCLK4 (100/64)M; PCLK3 25M; PCLK2 25M; PCLK1 100M; PCLK0 100M*/
+    M4_SYSREG->CMU_SCFGR = (0UL << 24U) | (1UL << 20U) | (6UL << 16U) | \
+                           (2UL << 12U) | (2UL << 8U)  | (0UL << 4U)  | \
                            (0UL << 0U);
 
     /* Switch system clock source to MPLL. */
@@ -200,10 +201,19 @@ int32_t main (void)
     SlaveSpiInit();
 
     MCU_CPU_IRQ_PinInit();
-
     MCU_CPU_IRQ_HIGH();
-
     MCU_CPU_IRQ_LOW();
+
+    USART_RX_IntConfig();
+
+    RandInit();
+
+    test = FlashRandGenerate();
+    test = FlashRandGenerate();
+    test = FlashRandGenerate();
+    test = FlashRandGenerate();
+
+    RandStop();
 
     while (1)
     {

@@ -479,6 +479,15 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
     {
         MEM_ZERO_STRUCT(stcDmaChCfg);
 
+        /* Clear communnication error status */
+        USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
+        USART_FuncCmd(USART_UNIT, UsartRx, Disable);
+        if (Set == USART_GetStatus(USART_UNIT, UsartOverrunErr))
+        {
+            USART_ClearStatus(USART_UNIT, UsartOverrunErr);
+        }
+        USART_RecData(USART_UNIT);
+
          /* DMA src and des inc config */
         stcDmaChCfg.enSrcInc = AddressFix;
         stcDmaChCfg.enDesInc = AddressIncrease;
@@ -496,7 +505,6 @@ en_result_t HAL_SPI_Receive_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], u
 
         USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
         USART_FuncCmd(USART_UNIT, UsartRx, Enable);
-        USART_FuncCmd(USART_UNIT, UsartRxInt, Enable);
     }
     //else
     //{
@@ -533,6 +541,16 @@ en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], 
     else
     {
         MEM_ZERO_STRUCT(stcDmaChCfg);
+
+        /* Clear communnication error status */
+        USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
+        USART_FuncCmd(USART_UNIT, UsartRx, Disable);
+        if (Set == USART_GetStatus(USART_UNIT, UsartOverrunErr))
+        {
+            USART_ClearStatus(USART_UNIT, UsartOverrunErr);
+        }
+        USART_RecData(USART_UNIT);
+
         /* DMA src and des inc config */
         stcDmaChCfg.enSrcInc = AddressIncrease;
         stcDmaChCfg.enDesInc = AddressFix;
@@ -546,8 +564,6 @@ en_result_t HAL_SPI_Transmit_DMA(const M4_SPI_TypeDef *SPIx, uint8_t pu8Data[], 
         DMA_SetTransferCnt(USART_TX_DMA_UNIT, USART_TX_DMA_CH, len);
         DMA_ChannelCmd(USART_TX_DMA_UNIT, USART_TX_DMA_CH, Enable);
 
-        USART_FuncCmd(USART_UNIT, UsartRx, Disable);
-        USART_FuncCmd(USART_UNIT, UsartRxInt, Disable);
         /*Enable TX interupt function*/
         USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Enable);
     }
@@ -796,7 +812,6 @@ void USART_RxCmplt(void)
     u8TestRev = 1;
 
     USART_FuncCmd(USART_UNIT, UsartRx, Disable);
-    USART_FuncCmd(USART_UNIT, UsartRxInt, Disable);
     DMA_ClearIrqFlag(USART_RX_DMA_UNIT, USART_RX_DMA_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(USART_RX_DMA_UNIT, USART_RX_DMA_CH, BlkTrnCpltIrq);
 }
@@ -938,6 +953,7 @@ void SlaveSpiInit(void)
         UsartRtsEnable,
     };
 
+    USART_DeInit(USART_UNIT);
     UsartDmaInit();
 
      /* Enable peripheral clock */
@@ -949,7 +965,6 @@ void SlaveSpiInit(void)
     PORT_SetFunc(USART_RX_PORT, USART_RX_PIN, USART_RX_FUNC, Disable);
     PORT_SetFunc(USART_TX_PORT, USART_TX_PIN, USART_TX_FUNC, Disable);
 
-    USART_DeInit(USART_UNIT);
     /* Initialize USART */
     USART_CLKSYNC_Init(USART_UNIT, &stcInitCfg);
     //USART_SetBaudrate(USART_UNIT, USART_BAUDRATE);
@@ -963,9 +978,12 @@ void SlaveSpiInit(void)
     NVIC_ClearPendingIRQ(stcIrqRegiCfg.enIRQn);
     NVIC_EnableIRQ(stcIrqRegiCfg.enIRQn);
 
-    /*Enable RX && RX interupt function*/
-    //USART_FuncCmd(USART_UNIT, UsartRx, Enable);
-    //USART_FuncCmd(USART_UNIT, UsartRxInt, Enable);
+    /* Clear communnication error status */
+    if (Set == USART_GetStatus(USART_UNIT, UsartOverrunErr))
+    {
+        USART_ClearStatus(USART_UNIT, UsartOverrunErr);
+    }
+    USART_RecData(USART_UNIT);
 }
 
 /**
@@ -1056,6 +1074,43 @@ void USART_RX_IntConfig(void)
 
     /* Enable wakeup */
     enIntWakeupEnable(Extint3WU);
+}
+
+void RandInit(void)
+{
+    stc_trng_init_t stcTrngInit;
+    /* TRGN clock config */
+    CLK_SetPeriClkSource(ClkPeriSrcPclk);
+
+    stcTrngInit.enLoadCtrl   = TrngLoadNewInitValue_Enable;
+    stcTrngInit.enShiftCount = TrngShiftCount_64;
+
+    /* 1. Enable TRNG. */
+    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_TRNG, Enable);
+    /* 2. Initialize TRNG. */
+    TRNG_Init(&stcTrngInit);
+}
+
+/* Software delay about 10mS */
+#define TIMEOUT_DELAY (SystemCoreClock/100ul)
+uint32_t FlashRandGenerate(void)
+{
+    uint32_t u32DataRead = 0ul;
+    /* Start TRNG, check TRNG and get random number. */
+    if(Ok != TRNG_Generate(&u32DataRead, 1u, TIMEOUT_DELAY))
+    {
+        u32DataRead = 0xFFFFFFFFul;
+    }
+
+    return u32DataRead;
+}
+
+void RandStop(void)
+{
+    /* 1. De-init TRNG */
+    TRNG_DeInit();
+    /* 2. Disable TRNG. */
+    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_TRNG, Disable);
 }
 
 /*******************************************************************************
