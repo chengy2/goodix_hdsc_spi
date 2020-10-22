@@ -113,9 +113,9 @@ static void SysClkIni(void)
 //    stcSysClkCfg.enPclk3Div = ClkSysclkDiv4;
 //    stcSysClkCfg.enPclk4Div = ClkSysclkDiv2;
 //    CLK_SysClkConfig(&stcSysClkCfg);
-    /* HCLK 100M; EXCKS 50M; PCLK4 (100/64)M; PCLK3 25M; PCLK2 25M; PCLK1 100M; PCLK0 100M*/
-    M4_SYSREG->CMU_SCFGR = (0UL << 24U) | (1UL << 20U) | (6UL << 16U) | \
-                           (2UL << 12U) | (2UL << 8U)  | (0UL << 4U)  | \
+    /* HCLK 192M; EXCKS 96M; PCLK4 96M; PCLK3 48M; PCLK2 48M; PCLK1 96M; PCLK0 192M*/
+    M4_SYSREG->CMU_SCFGR = (0UL << 24U) | (1UL << 20U) | (1UL << 16U) | \
+                           (2UL << 12U) | (2UL << 8U)  | (1UL << 4U)  | \
                            (0UL << 0U);
 
     /* Switch system clock source to MPLL. */
@@ -127,19 +127,24 @@ static void SysClkIni(void)
 //    CLK_XtalCmd(Enable);
 
     /* MPLL config. */
-    stcMpllCfg.pllmDiv = 4u;    /* 16M/4=4M*/
-    stcMpllCfg.plln = 75u;      /* 4M*75=300M*/
-    stcMpllCfg.PllpDiv = 3u;    /* MPLLP = 100 */
-    stcMpllCfg.PllqDiv = 6u;
-    stcMpllCfg.PllrDiv = 6u;
+    stcMpllCfg.pllmDiv = 2u;
+    stcMpllCfg.plln = 48u;
+    stcMpllCfg.PllpDiv = 2u;    //MPLLP = 192
+    stcMpllCfg.PllqDiv = 8u;
+    stcMpllCfg.PllrDiv = 8u;
 //    CLK_SetPllSource(ClkPllSrcXTAL);
     M4_SYSREG->CMU_PLLCFGR_f.PLLSRC = ClkPllSrcHRC;
     CLK_MpllConfig(&stcMpllCfg);
 
     /* flash read wait cycle setting */
     EFM_Unlock();
-    EFM_SetLatency(EFM_LATENCY_2);
+    EFM_SetLatency(EFM_LATENCY_4);
     EFM_Lock();
+
+    /* sram init include read/write wait cycle setting */
+    M4_SRAMC->WTPR = 0x77u;
+    M4_SRAMC->WTCR = 0x11001111ul;
+    M4_SRAMC->WTPR = 0x76u;
 
     /* Enable MPLL. */
 //    CLK_MpllCmd(Enable);

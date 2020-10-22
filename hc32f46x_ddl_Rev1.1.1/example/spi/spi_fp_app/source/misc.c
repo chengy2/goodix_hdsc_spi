@@ -292,7 +292,7 @@ void MasterSpiInit(void)
     stcSpiInit.stcDelayConfig.enSsHoldDelayOption = SpiSsHoldDelayCustomValue;
     stcSpiInit.stcDelayConfig.enSsHoldDelayTime = SpiSsHoldDelaySck1;
     stcSpiInit.stcDelayConfig.enSsIntervalTimeOption = SpiSsIntervalCustomValue;
-    stcSpiInit.stcDelayConfig.enSsIntervalTime = SpiSsIntervalSck6PlusPck2;
+    stcSpiInit.stcDelayConfig.enSsIntervalTime = SpiSsIntervalSck1PlusPck2;
 
     SPI_Init(SPI_UNIT, &stcSpiInit);
     SPI_Cmd(SPI_UNIT, Enable);
@@ -722,7 +722,7 @@ void EcIntConfig(void)
 
     /* Exint config */
     stcExtiConfig.enExitCh = EC_EXINT_CH;
-    stcExtiConfig.enFilterEn = Enable;
+    stcExtiConfig.enFilterEn = Disable;
     stcExtiConfig.enFltClk = Pclk3Div8;
     stcExtiConfig.enExtiLvl = ExIntBothEdge;  /* Rising and falling edge */
     EXINT_Init(&stcExtiConfig);
@@ -774,7 +774,7 @@ void FPIntConfig(void)
 
     /* Exint config */
     stcExtiConfig.enExitCh = FP_EXINT_CH;
-    stcExtiConfig.enFilterEn = Enable;
+    stcExtiConfig.enFilterEn = Disable;
     stcExtiConfig.enFltClk = Pclk3Div8;
     stcExtiConfig.enExtiLvl = ExIntRisingEdge;  /* Rising edge */
     EXINT_Init(&stcExtiConfig);
@@ -1057,7 +1057,7 @@ void USART_RX_IntConfig(void)
 
     /* Exint config */
     stcExtiConfig.enExitCh = USART_RX_EXINT_CH;
-    stcExtiConfig.enFilterEn = Enable;
+    stcExtiConfig.enFilterEn = Disable;
     stcExtiConfig.enFltClk = Pclk3Div8;
     stcExtiConfig.enExtiLvl = ExIntRisingEdge;  /* Rising edge */
     EXINT_Init(&stcExtiConfig);
