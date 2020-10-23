@@ -801,10 +801,17 @@ uint8_t u8TestTrans = 0;
 void USART_TxCmplt(void)
 {
     u8TestTrans = 1;
+    uint32_t u32Timeout = 200ul; /* Delay */
+
+    /* Wait transfer complete */
+    while(Reset == USART_GetStatus(USART_UNIT, UsartTxComplete) && (u32Timeout--));
 
     USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
     DMA_ClearIrqFlag(USART_TX_DMA_UNIT, USART_TX_DMA_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(USART_TX_DMA_UNIT, USART_TX_DMA_CH, BlkTrnCpltIrq);
+
+    /* Add your code here */
+
 }
 
 void USART_RxCmplt(void)
