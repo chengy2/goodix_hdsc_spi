@@ -802,7 +802,7 @@ void USART_TxCmplt(void)
 {
     u8TestTrans = 1;
 
-    USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
+    //USART_FuncCmd(USART_UNIT, UsartTxAndTxEmptyInt, Disable);
     DMA_ClearIrqFlag(USART_TX_DMA_UNIT, USART_TX_DMA_CH, TrnCpltIrq);
     DMA_ClearIrqFlag(USART_TX_DMA_UNIT, USART_TX_DMA_CH, BlkTrnCpltIrq);
 }
